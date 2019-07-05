@@ -1,0 +1,7 @@
+{
+  "name": "Iactus",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}
