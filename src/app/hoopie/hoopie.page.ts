@@ -7,7 +7,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HoopiePage implements OnInit {
 
-  constructor() { }
+  x_coord: number;
+  y_coord: number;
+  z_coord: number;
+
+  constructor() {
+    this.x_coord = 4;
+    this.y_coord = 0;
+    this.z_coord = 4;
+  }
 
   ngOnInit() {
   }
