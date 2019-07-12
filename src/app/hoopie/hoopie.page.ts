@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
 import { Gyroscope } from '@ionic-native/gyroscope/ngx';
 import { NativeStorage } from '@ionic-native/native-storage/ngx';
+import { Events } from '@ionic/angular';
 
 @Component({
   selector: 'app-hoopie',
   templateUrl: './hoopie.page.html',
   styleUrls: ['./hoopie.page.scss'],
+  providers: [],
 })
 export class HoopiePage implements OnInit {
 
@@ -34,11 +36,13 @@ export class HoopiePage implements OnInit {
   datColDisable: boolean;
 
   ardatacol: boolean;
+  ardatacolg: boolean;
 
   constructor(
     private devMotion: DeviceMotion,
     private gyro: Gyroscope,
-    private store: NativeStorage) {
+    private store: NativeStorage,
+    private sub: Events) {
 
     // Initiate Frontend Stuff
     this.dx_coord = 4;
@@ -62,6 +66,13 @@ export class HoopiePage implements OnInit {
       data => this.ardatacol,
       error => this.ardatacol = false
     )
+    
+    this.sub.subscribe("ardatacol", (data) => {
+      console.log(data);
+      this.ardatacol = (data);
+    })
+
+    this.sub.publish("ardatacol", this.ardatacolg);
   }
 
   ngOnInit() {
@@ -74,11 +85,21 @@ export class HoopiePage implements OnInit {
     this.sttButtonColor = "medium"
     this.stpButtonDisable = false;
     this.stpButtonText = "Stop";
-    this.devMotionSub = this.devMotion.watchAcceleration().subscribe((accel: DeviceMotionAccelerationData) => {
-      this.dx_coord = accel.x;
-      this.dy_coord = accel.y;
-      this.dz_coord = accel.z;
-    });
+    try {
+      this.devMotionSub = this.devMotion.watchAcceleration().subscribe((accel: DeviceMotionAccelerationData) => {
+        this.dx_coord = accel.x;
+        this.dy_coord = accel.y;
+        this.dz_coord = accel.z;
+      });
+    } catch {
+      console.log("Sensor Error! Stopping...");
+      this.stpButtonDisable = true;
+      this.stpButtonText = "Stop";
+      this.sttButtonDisable = false;
+      this.sttButtonText = "Sensor Error!";
+      this.sttButtonColor = "warning";
+      this.devMotionSub.unsubscribe();
+    }
   }
 
   stopAid() {

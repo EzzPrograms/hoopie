@@ -9,7 +9,6 @@ import { DeviceMotion } from '@ionic-native/device-motion/ngx';
 import { Gyroscope } from '@ionic-native/gyroscope/ngx';
 import { NativeStorage } from '@ionic-native/native-storage/ngx';
 
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
