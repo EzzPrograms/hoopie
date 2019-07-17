@@ -139,7 +139,7 @@ export class HoopiePage implements OnInit {
   }
 
   datCol() {
-    console.log("Starting Data Collection for tacap shot.");
+    console.log("Starting Data Collection for shots.");
     this.sttButtonDisable = true;
     this.stpButtonDisable = false;
     this.datColDisable = true;
