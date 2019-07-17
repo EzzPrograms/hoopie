@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
-import { Gyroscope } from '@ionic-native/gyroscope/ngx';
+import { DeviceMotion, DeviceMotionAccelerationData, DeviceMotionAccelerometerOptions } from '@ionic-native/device-motion/ngx';
+import { Gyroscope, GyroscopeOptions, GyroscopeOrientation } from '@ionic-native/gyroscope/ngx';
+import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
 import { NativeStorage } from '@ionic-native/native-storage/ngx';
 import { Events } from '@ionic/angular';
 
@@ -14,6 +15,7 @@ export class HoopiePage implements OnInit {
 
   devMotionSub: any;
   gyroSub: any;
+  gyroSubData: any;
 
   dx_coord: number;
   dy_coord: number;
@@ -22,6 +24,14 @@ export class HoopiePage implements OnInit {
   gx_coord: number;
   gy_coord: number;
   gz_coord: number;
+
+  cgx_coord: number;
+  cgy_coord: number;
+  cgz_coord: number;
+
+  cdx_coord: number;
+  cdy_coord: number;
+  cdz_coord: number;
 
   sttButtonColor: string;
   sttButtonText: string;
@@ -42,7 +52,8 @@ export class HoopiePage implements OnInit {
     private devMotion: DeviceMotion,
     private gyro: Gyroscope,
     private store: NativeStorage,
-    private sub: Events) {
+    private sub: Events,
+    private blueSer: BluetoothSerial) {
 
     // Initiate Frontend Stuff
     this.dx_coord = 4;
@@ -60,6 +71,13 @@ export class HoopiePage implements OnInit {
     this.sttButtonDisable = false;
     this.stpButtonDisable = true;
     this.datColDisable = false;
+
+    this.cdx_coord = 4;
+    this.cdy_coord = 0;
+    this.cdz_coord = 4;
+    this.cgx_coord = 0;
+    this.cgy_coord = 0;
+    this.cgz_coord = 0;
 
     // Get Settings (If Exist)
     this.store.getItem('ardatacol').then(
@@ -85,11 +103,66 @@ export class HoopiePage implements OnInit {
     this.sttButtonColor = "medium"
     this.stpButtonDisable = false;
     this.stpButtonText = "Stop";
+    if(this.ardatacol == false) {
+      try {
+        const option: DeviceMotionAccelerometerOptions = {
+          frequency: 100
+        };
+  
+        this.devMotionSub = this.devMotion.watchAcceleration(option).subscribe((accel: DeviceMotionAccelerationData) => {
+          this.dx_coord = accel.x;
+          this.dy_coord = accel.y;
+          this.dz_coord = accel.z;
+        });
+  
+        let options: GyroscopeOptions = {
+          frequency: 100
+        }
+  
+        this.gyroSub = this.gyro.watch(options).subscribe((orient: GyroscopeOrientation) => {
+          this.gx_coord = orient.x;
+          this.gy_coord = orient.y;
+          this.gz_coord = orient.z;
+        });
+      } catch {
+        console.log("Sensor Error! Stopping...");
+        this.stpButtonDisable = true;
+        this.stpButtonText = "Stop";
+        this.sttButtonDisable = false;
+        this.sttButtonText = "Sensor Error!";
+        this.sttButtonColor = "warning";
+        this.devMotionSub.unsubscribe();
+      }
+    } else if (this.ardatacol == true) {
+      // Incomplete due to: Lack of Bluetooth Classic support for iOS
+    }
+  }
+
+  datCol() {
+    console.log("Starting Data Collection for tacap shot.");
+    this.sttButtonDisable = true;
+    this.stpButtonDisable = false;
+    this.datColDisable = true;
+    this.datColColor = "secondary";
+    this.datColText = "Collecting Data";
     try {
-      this.devMotionSub = this.devMotion.watchAcceleration().subscribe((accel: DeviceMotionAccelerationData) => {
-        this.dx_coord = accel.x;
-        this.dy_coord = accel.y;
-        this.dz_coord = accel.z;
+      let options: GyroscopeOptions = {
+        frequency: 100
+      }
+
+      this.gyroSubData = this.gyro.watch(options).subscribe((orient: GyroscopeOrientation) => {
+        this.gx_coord = orient.x;
+        this.gy_coord = orient.y;
+        this.gz_coord = orient.z;
+        if(this.gx_coord > this.cgx_coord) {
+          this.cgx_coord = this.gx_coord;
+        }
+        if(this.gy_coord > this.cgy_coord) {
+          this.cgy_coord = this.gy_coord;
+        }
+        if(this.gz_coord > this.cgz_coord) {
+          this.cgz_coord = this.gz_coord;
+        }
       });
     } catch {
       console.log("Sensor Error! Stopping...");
@@ -98,8 +171,17 @@ export class HoopiePage implements OnInit {
       this.sttButtonDisable = false;
       this.sttButtonText = "Sensor Error!";
       this.sttButtonColor = "warning";
-      this.devMotionSub.unsubscribe();
+      this.gyroSubData.unsubscribe();
     }
+    /*
+    setTimeout(function() {
+      console.log("Data Collection completed.");
+      temp.sttButtonDisable = false;
+      temp.datColDisable = false;
+      temp.datColColor = "primary";
+      temp.datColText = "Collected Data"
+    }, 5000);
+    */
   }
 
   stopAid() {
@@ -110,22 +192,7 @@ export class HoopiePage implements OnInit {
     this.sttButtonText = "Start";
     this.sttButtonColor = "success";
     this.devMotionSub.unsubscribe();
-  }
-
-  datCol() {
-    console.log("Starting Data Collection for 5 shots.");
-    this.sttButtonDisable = true;
-    this.stpButtonDisable = true;
-    this.datColDisable = true;
-    this.datColColor = "secondary";
-    this.datColText = "Collecting Data";
-    const temp = this;
-    setTimeout(function() {
-      console.log("Data Collection completed.");
-      temp.sttButtonDisable = false;
-      temp.datColDisable = false;
-      temp.datColColor = "primary";
-      temp.datColText = "Collected Data"
-    }, 5000);
+    this.gyroSub.unsubscribe();
+    this.gyroSubData.unsubscribe();
   }
 }
