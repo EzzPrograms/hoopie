@@ -163,6 +163,9 @@ export class HoopiePage implements OnInit {
         if(this.gz_coord > this.cgz_coord) {
           this.cgz_coord = this.gz_coord;
         }
+        console.log(orient.x);
+        console.log(orient.y);
+        console.log(orient.z);
       });
     } catch {
       console.log("Sensor Error! Stopping...");
