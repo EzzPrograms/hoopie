@@ -75,6 +75,11 @@ export class SensorsPage implements OnInit {
  pairedDeviceID: number = 0;
  dataSend: string = "";
 
+ angX: string;
+ angY: string;
+ gyroX: string;
+ gyroY: string;
+
  constructor(public navCtrl: NavController,
   private alertCtrl: AlertController,
   private bluetoothSerial: BluetoothSerial) {
@@ -154,7 +159,7 @@ export class SensorsPage implements OnInit {
   }, error => {
     this.showError(error)
   });
-}
+ }
 
  sendCustomData() {
    this.dataSend+='\n';
@@ -165,6 +170,14 @@ export class SensorsPage implements OnInit {
    }, error => {
      this.showError(error)
    });
+ }
+
+ refresh() {
+   this.sendData('2');
+   this.bluetoothSerial.read
+   this.sendData('3');
+   this.sendData('5');
+   this.sendData('6');
  }
 
  async showError(error) {
