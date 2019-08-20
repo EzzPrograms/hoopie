@@ -9,6 +9,7 @@ import { DeviceMotion } from '@ionic-native/device-motion/ngx';
 import { Gyroscope } from '@ionic-native/gyroscope/ngx';
 import { NativeStorage } from '@ionic-native/native-storage/ngx';
 import { BluetoothSerial } from '@ionic-native/bluetooth-serial/ngx';
+import { BLE } from '@ionic-native/ble/ngx';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -24,6 +25,7 @@ import { AppComponent } from './app.component';
     Gyroscope,
     NativeStorage,
     BluetoothSerial,
+    BLE,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

@@ -1,0 +1,76 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Sensors</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!--
+  <ion-label>Sensors:</ion-label>
+  <ion-button (click)="scanBLE()">
+    Scan for Devices
+  </ion-button>
+  <ion-list> 
+    <button ion-item *ngFor="let device of devices" (click)="deviceSelected(device)">
+      <h2>{{ device.name || 'Unnamed' }}</h2>
+      <p>{{ device.id }}</p>
+      <p>RSSI: {{ device.rssi }}</p>
+    </button>  
+   </ion-list> 
+  -->
+  <button ion-button full class="submit-button" (click)="listPairedDevices()">
+      <ion-icon name="refresh"></ion-icon>&nbsp;Refresh Bluetooth Devices</button>
+    <ion-row>
+      <ion-col>
+        <ion-list radio-group [(ngModel)]="pairedDeviceID" *ngIf="listToggle">
+          <ion-item *ngFor="let i of pairedList;let j=index">
+            <ion-label>{{i.name}}</ion-label>
+            <ion-radio value="{{j}}" ></ion-radio>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+    <button ion-button full class="submit-button" *ngIf="listToggle" (click)="selectDevice()">
+      <ion-icon name="bluetooth"></ion-icon>&nbsp;Connect Bluetooth Devices</button>
+    <ion-list>
+      <ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6">
+                <button ion-button (click)="sendData('1')">
+                  Start Operation
+                </button>
+            </ion-col>
+            <ion-col size="6">
+                <button ion-button (click)="sendData('0')">
+                  Stop Operation
+                </button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+      <ion-item>
+          <ion-grid>
+            <ion-row>
+              <ion-col size="6">
+                  <button ion-button (click)="sendData('8')">
+                    Correct Buzz
+                  </button>
+              </ion-col>
+              <ion-col size="6">
+                  <button ion-button (click)="sendData('9')">
+                    Wrong Buzz
+                  </button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+      <ion-item>
+        <ion-label floating>Custom Data: </ion-label>
+        <ion-input type="text" name="datasend" [(ngModel)]="dataSend"></ion-input>
+      </ion-item>
+    </ion-list>
+    <button ion-button full class="submit-button" (click)="sendCustomData()">
+      <ion-icon name="send"></ion-icon>&nbsp;Send Data Via Bluetooth
+    </button>
+</ion-content>

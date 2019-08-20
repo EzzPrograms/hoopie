@@ -26,6 +26,15 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'sensors',
+        children: [
+          {
+            path: '',
+            loadChildren: '../sensors/sensors.module#SensorsPageModule'
+          }
+        ]
+      },
+      {
         path: '',
         redirectTo: '/tabs/hoopie',
         pathMatch: 'full'

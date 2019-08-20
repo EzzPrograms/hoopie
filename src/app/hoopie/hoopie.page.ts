@@ -135,6 +135,7 @@ export class HoopiePage implements OnInit {
       }
     } else if (this.ardatacol == true) {
       // Incomplete due to: Lack of Bluetooth Classic support for iOS
+      
     }
   }
 
